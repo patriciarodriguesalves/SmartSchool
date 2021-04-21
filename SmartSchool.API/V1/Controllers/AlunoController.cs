@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SmartSchool.API.Data;
+using SmartSchool.API.Helpers;
 using SmartSchool.API.Models;
 using SmartSchool.API.V1.Dtos;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SmartSchool.API.V1.Controllers
 {
@@ -36,11 +38,15 @@ namespace SmartSchool.API.V1.Controllers
         /// <returns></returns>
         // GET: api/aluno
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get([FromQuery]PageParams pageParams)
         {
-            var alunos = _repo.GetAllAlunos(true);
+            var alunos = await _repo.GetAllAlunosAsync(pageParams, true);
 
-            return Ok(_mapper.Map<IEnumerable<AlunoDto>>(alunos));
+            var alunosResult = _mapper.Map<IEnumerable<AlunoDto>>(alunos);
+
+            Response.AddPagination(alunos.CurrentPage, alunos.PageSize, alunos.TotalCount, alunos.TotalPages);
+
+            return Ok(alunosResult);
         }
 
         /// <summary>
@@ -50,7 +56,7 @@ namespace SmartSchool.API.V1.Controllers
         /// <returns></returns>
         // GET api/aluno/id
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             var aluno = _repo.GetAlunoById(id, false);
             if (aluno == null) return BadRequest("O Aluno não foi encontrado");
