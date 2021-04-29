@@ -56,7 +56,7 @@ namespace SmartSchool.API.V1.Controllers
         /// <returns></returns>
         // GET api/aluno/id
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public IActionResult GetById(int id)
         {
             var aluno = _repo.GetAlunoById(id, false);
             if (aluno == null) return BadRequest("O Aluno não foi encontrado");
